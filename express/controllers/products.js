@@ -1,3 +1,5 @@
+const Product = require('../models/product');
+
 module.exports.getAddProduct = (req, res, next) => {
   res.render('add-product', {
     pageTitle: 'Add Product',
@@ -6,13 +8,15 @@ module.exports.getAddProduct = (req, res, next) => {
 };
 
 module.exports.postAddProduct = (req, res, next) => {
-  console.log(req.body);
+  const product = new Product(req.body.title);
+  product.save();
   res.redirect('/');
 };
 
 module.exports.getProducts = (req, res, next) => {
+  const products = Product.fetchAll();
   res.render('shop', {
-    prods: [{ title: 'A book' }],
+    prods: products,
     pageTitle: 'Shop',
     path: '/'
   });
