@@ -35,7 +35,7 @@ module.exports.getProducts = (req, res, next) => {
 };
 
 module.exports.getProductDetail = (req, res, next) => {
-  Product.fetchOne(req.params.id, product => {
+  Product.fetchOne(Number(req.params.id), product => {
     if (product) {
       return res.render('shop/product-detail', {
         prod: product,

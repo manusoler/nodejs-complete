@@ -21,7 +21,7 @@ const getProductFromFile = (id, cb) => {
     let product = null;
     if (!err) {
       const products = JSON.parse(data);
-      product = products.find(elem => elem.id === parseInt(id, 10));
+      product = products.find(elem => elem.id === id);
     }
     cb(product);
   });
@@ -46,6 +46,22 @@ module.exports = class Product {
       // add this product to file
       products.push(this);
       fs.writeFile(p, JSON.stringify(products), () => {});
+    });
+  }
+
+  update() {
+    getProductsFromFile(products => {
+      const newProds = products.map(elem =>
+        elem.id === this.id ? this : elem
+      );
+      fs.writeFile(p, JSON.stringify(newProds), () => {});
+    });
+  }
+
+  delete() {
+    getProductsFromFile(products => {
+      const newProds = products.filter(elem => elem.id !== this.id);
+      fs.writeFile(p, JSON.stringify(newProds), () => {});
     });
   }
 
