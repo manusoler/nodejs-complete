@@ -1,33 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+const db = require('../util/database');
 
 const Cart = require('./cart');
-
-const p = path.join(
-  path.dirname(process.mainModule.filename),
-  'data',
-  'products.json'
-);
-const getProductsFromFile = cb => {
-  fs.readFile(p, (err, data) => {
-    let products = [];
-    if (!err) {
-      products = JSON.parse(data);
-    }
-    cb(products);
-  });
-};
-
-const getProductFromFile = (id, cb) => {
-  fs.readFile(p, (err, data) => {
-    let product = null;
-    if (!err) {
-      const products = JSON.parse(data);
-      product = products.find(elem => elem.id === id);
-    }
-    cb(product);
-  });
-};
 
 module.exports = class Product {
   constructor(title, imageUrl, price, description) {
@@ -73,11 +46,11 @@ module.exports = class Product {
     });
   }
 
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
+  static fetchAll() {
+    return db.execute('SELECT * FROM products');
   }
 
-  static fetchOne(id, cb) {
-    getProductFromFile(id, cb);
+  static fetchOne(id) {
+    db.execute('SELECT * FROM products WHERE id = ?');
   }
 };
