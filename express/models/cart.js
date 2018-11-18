@@ -13,6 +13,17 @@ module.exports = class Cart {
     this.totalPrice = 0;
   }
 
+  static getCart(cb) {
+    // Fetch the previos cart
+    fs.readFile(p, (err, data) => {
+      let cart = new Cart();
+      if (!err) {
+        cart = JSON.parse(data);
+      }
+      cb(cart);
+    });
+  }
+
   static addProduct(id, productPrize) {
     // Fetch the previos cart
     fs.readFile(p, (err, data) => {
@@ -36,6 +47,23 @@ module.exports = class Cart {
       }
       cart.totalPrice = cart.totalPrice + Number(productPrize);
       fs.writeFile(p, JSON.stringify(cart), err => {});
+    });
+  }
+
+  static deleteProduct(id, productPrize) {
+    // Fetch the previos cart
+    fs.readFile(p, (err, data) => {
+      if (err) {
+        return;
+      }
+      const cart = JSON.parse(data);
+      const delProductIndex = cart.products.findIndex(elem => elem.id === +id);
+      const delProduct = cart.products[delProductIndex];
+      if (delProductIndex >= 0) {
+        cart.products.splice(delProductIndex, 1);
+        cart.totalPrice = cart.totalPrice - +productPrize * delProduct.qty;
+        fs.writeFile(p, JSON.stringify(cart), err => {});
+      }
     });
   }
 

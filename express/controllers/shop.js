@@ -12,9 +12,23 @@ module.exports.getIndex = (req, res, next) => {
 };
 
 module.exports.getCart = (req, res, next) => {
-  res.render('shop/cart', {
-    pageTitle: 'Cart',
-    path: '/cart'
+  Cart.getCart(cart => {
+    Product.fetchAll(products => {
+      const cartProducts = [];
+      for (const product of products) {
+        const cartProductData = cart.products.find(
+          prod => prod.id === product.id
+        );
+        if (cartProductData) {
+          cartProducts.push({ ...product, qty: cartProductData.qty });
+        }
+      }
+      res.render('shop/cart', {
+        pageTitle: 'Cart',
+        path: '/cart',
+        cartProducts
+      });
+    });
   });
 };
 
@@ -22,6 +36,15 @@ module.exports.getAddToCart = (req, res, next) => {
   Product.fetchOne(Number(req.params.id), product => {
     if (product) {
       Cart.addProduct(product.id, product.price);
+    }
+    res.redirect('/cart');
+  });
+};
+
+module.exports.getRemoveFromCart = (req, res, next) => {
+  Product.fetchOne(+req.params.id, product => {
+    if (product) {
+      Cart.deleteProduct(product.id, product.price);
     }
     res.redirect('/cart');
   });
