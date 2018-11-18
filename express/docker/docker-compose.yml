@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  node_db:
+    # build: . // Cuando se tenga solo un Dockerfile
+    # build: // Cuando se especifique explicitamente el dockerfile
+    #  context: .
+    #  dockerfile: Dockerfile.db
+    image: mysql:5.7
+    container_name: node_db
+    environment:
+      MYSQL_ROOT_PASSWORD: node1234
+      MYSQL_DATABASE: node
+      #MYSQL_USER: root
+      #MYSQL_PASSWORD: 5gad3a43
+    ports:
+      - '3306:3306'
