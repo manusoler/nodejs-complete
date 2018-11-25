@@ -12,23 +12,15 @@ module.exports = class Product {
   }
 
   save() {
-    getProductsFromFile(products => {
-      // Fetch last id from file
-      this.id = 1;
-      if (products.length) {
-        this.id = products[products.length - 1].id + 1;
-      }
-      // add this product to file
-      products.push(this);
-      fs.writeFile(p, JSON.stringify(products), () => {});
-    });
+    return db.execute(
+      'INSERT INTO products (title, price, imageUrl, description) VALUE (?, ?, ?, ?)',
+      [this.title, this.price, this.imageUrl, this.description]
+    );
   }
 
   update() {
     getProductsFromFile(products => {
-      const newProds = products.map(elem =>
-        elem.id === this.id ? this : elem
-      );
+      const newProds = products.map(elem => (elem.id === this.id ? this : elem));
       fs.writeFile(p, JSON.stringify(newProds), () => {});
     });
   }
@@ -51,6 +43,6 @@ module.exports = class Product {
   }
 
   static fetchOne(id) {
-    db.execute('SELECT * FROM products WHERE id = ?');
+    return db.execute('SELECT * FROM products WHERE id = ?', [id]);
   }
 };

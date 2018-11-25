@@ -31,21 +31,25 @@ module.exports.getCart = (req, res) => {
 };
 
 module.exports.getAddToCart = (req, res) => {
-  Product.fetchOne(Number(req.params.id), product => {
-    if (product) {
-      Cart.addProduct(product.id, product.price);
-    }
-    res.redirect('/cart');
-  });
+  Product.fetchOne(Number(req.params.id))
+    .then(([[product]]) => {
+      if (product) {
+        Cart.addProduct(product.id, product.price);
+      }
+      res.redirect('/cart');
+    })
+    .catch(err => console.log(err));
 };
 
 module.exports.getRemoveFromCart = (req, res) => {
-  Product.fetchOne(+req.params.id, product => {
-    if (product) {
-      Cart.deleteProduct(product.id, product.price);
-    }
-    res.redirect('/cart');
-  });
+  Product.fetchOne(+req.params.id)
+    .then(([[product]]) => {
+      if (product) {
+        Cart.deleteProduct(product.id, product.price);
+      }
+      res.redirect('/cart');
+    })
+    .catch(err => console.log(err));
 };
 
 module.exports.getOrders = (req, res) => {
@@ -73,14 +77,16 @@ module.exports.getProducts = (req, res) => {
 };
 
 module.exports.getProductDetail = (req, res) => {
-  Product.fetchOne(Number(req.params.id), product => {
-    if (product) {
-      return res.render('shop/product-detail', {
-        prod: product,
-        pageTitle: 'Product Detail',
-        path: '/product-detail'
-      });
-    }
-    return res.redirect('/not-found');
-  });
+  Product.fetchOne(Number(req.params.id))
+    .then(([[product]]) => {
+      if (product) {
+        return res.render('shop/product-detail', {
+          prod: product,
+          pageTitle: 'Product Detail',
+          path: '/product-detail'
+        });
+      }
+      return res.redirect('/not-found');
+    })
+    .catch(err => console.log(err));
 };
