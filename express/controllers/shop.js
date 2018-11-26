@@ -2,7 +2,7 @@ const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 module.exports.getIndex = (req, res) => {
-  Product.fetchAll().then(([rows]) =>
+  Product.findAll().then(rows =>
     res.render('shop/product-list', {
       prods: rows,
       pageTitle: 'Shop',
@@ -13,7 +13,7 @@ module.exports.getIndex = (req, res) => {
 
 module.exports.getCart = (req, res) => {
   Cart.getCart(cart => {
-    Product.fetchAll().then(([rows]) => {
+    Product.findAll().then(rows => {
       const cartProducts = [];
       rows.forEach(product => {
         const cartProductData = cart.products.find(prod => prod.id === product.id);
@@ -31,8 +31,8 @@ module.exports.getCart = (req, res) => {
 };
 
 module.exports.getAddToCart = (req, res) => {
-  Product.fetchOne(Number(req.params.id))
-    .then(([[product]]) => {
+  Product.findByPk(Number(req.params.id))
+    .then(product => {
       if (product) {
         Cart.addProduct(product.id, product.price);
       }
@@ -42,8 +42,8 @@ module.exports.getAddToCart = (req, res) => {
 };
 
 module.exports.getRemoveFromCart = (req, res) => {
-  Product.fetchOne(+req.params.id)
-    .then(([[product]]) => {
+  Product.findByPk(+req.params.id)
+    .then(product => {
       if (product) {
         Cart.deleteProduct(product.id, product.price);
       }
@@ -67,7 +67,7 @@ module.exports.getCheckout = (req, res) => {
 };
 
 module.exports.getProducts = (req, res) => {
-  Product.fetchAll().then(([rows]) =>
+  Product.findAll().then(rows =>
     res.render('shop/product-list', {
       prods: rows,
       pageTitle: 'Products',
@@ -77,8 +77,8 @@ module.exports.getProducts = (req, res) => {
 };
 
 module.exports.getProductDetail = (req, res) => {
-  Product.fetchOne(Number(req.params.id))
-    .then(([[product]]) => {
+  Product.findByPk(Number(req.params.id))
+    .then(product => {
       if (product) {
         return res.render('shop/product-detail', {
           prod: product,
