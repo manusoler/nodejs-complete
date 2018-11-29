@@ -34,7 +34,7 @@ module.exports.getAddToCart = (req, res) => {
     }
     ).then(products => {
       let product = products.length ? products[0] : null;
-      let newQuantity = product ? (product.quantity + 1) : 1;
+      let newQuantity = product ? (product.cartItem.quantity + 1) : 1;
 
       return Product.findByPk(prodId).then(
         product => {
@@ -56,14 +56,15 @@ module.exports.getAddToCart = (req, res) => {
 };
 
 module.exports.getRemoveFromCart = (req, res) => {
-  Product.findByPk(+req.params.id)
-    .then(product => {
-      if (product) {
-        Cart.deleteProduct(product.id, product.price);
-      }
-      res.redirect('/cart');
-    })
-    .catch(err => console.log(err));
+  const prodId = +req.params.id;
+  req.user.getCart()
+  .then(cart => cart.getProducts({where: {id: prodId}}))
+  .then(products => {
+    const product = products.length ? products[0] : null;
+    return product.cartItem.destroy();
+  })
+  .then(() => res.redirect('/cart'))
+  .catch(err => console.log(err))
 };
 
 module.exports.getOrders = (req, res) => {
