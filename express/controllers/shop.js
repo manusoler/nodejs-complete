@@ -12,25 +12,39 @@ module.exports.getIndex = (req, res) => {
 };
 
 module.exports.getCart = (req, res) => {
-  Cart.getCart(cart => {
-    Product.findAll().then(rows => {
-      const cartProducts = [];
-      rows.forEach(product => {
-        const cartProductData = cart.products.find(prod => prod.id === product.id);
-        if (cartProductData) {
-          cartProducts.push({ ...product, qty: cartProductData.qty });
-        }
-      });
+  req.user.getCart()
+    .then(cart => cart.getProducts())
+    .then(products =>
       res.render('shop/cart', {
         pageTitle: 'Cart',
         path: '/cart',
-        cartProducts
-      });
-    });
-  });
+        cartProducts: products
+      })
+    )
+    .catch(err => console.log(err));
 };
 
 module.exports.getAddToCart = (req, res) => {
+  const prodId = +req.params.id;
+  let fetchCart;
+  req.user.getCart()
+    .then(cart => {
+      fetchCart = cart;
+      return cart.getProducts({ where: { id: prodId } })
+    }
+    ).then(products => {
+      let product = products.length ? products[0] : null;
+      let newQuantity = product ? (product.quantity + 1) : 1;
+
+      return Product.findByPk(prodId).then(
+        product => {
+          return fetchCart.addProduct(product, { through: { quantity: newQuantity } })
+        }
+      ).catch(err => console.log(err));
+
+    }).then(() => res.redirect('/cart'))
+    .catch(err => console.log(err));
+
   Product.findByPk(Number(req.params.id))
     .then(product => {
       if (product) {

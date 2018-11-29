@@ -7,6 +7,8 @@ const sequelize = require('./util/database');
 // Sequelize Models
 const Product = require('./models/product');
 const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
 
 const app = express();
 
@@ -38,11 +40,18 @@ app.use(shopRoutes);
 // Erros (404)
 app.use(errorsController.notFound);
 
-// Create database model
+// Create database relations
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(Cart);
+Cart.belongsToMany(Product, {through: CartItem});
+Product.belongsToMany(Cart, {through: CartItem});
+
+// Create database and sync
 sequelize
-  .sync({ force: true })
+  //.sync({ force: true })
+  .sync()
   .then(result => {
     return User.findByPk(1);
   })
@@ -52,5 +61,6 @@ sequelize
     }
     return user;
   })
+  .then((user) => user.createCart())
   .then(() => app.listen(3000))
   .catch(err => console.log(err));
