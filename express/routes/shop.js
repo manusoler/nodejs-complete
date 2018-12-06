@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 const shopController = require('../controllers/shop');
 
@@ -10,6 +9,7 @@ router.get('/add-to-cart/:id', shopController.getAddToCart);
 router.get('/remove-from-cart/:id', shopController.getRemoveFromCart);
 router.get('/cart', shopController.getCart);
 router.get('/orders', shopController.getOrders);
+router.post('/create-order', shopController.postOrder);
 router.get('/checkout', shopController.getCheckout);
 router.get('/product-detail/:id', shopController.getProductDetail);
 

@@ -47,26 +47,24 @@ Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
 User.hasOne(Cart);
 Cart.belongsTo(User);
-Cart.belongsToMany(Product, {through: CartItem});
-Product.belongsToMany(Cart, {through: CartItem});
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
 User.hasMany(Order);
 Order.belongsTo(User);
-Order.belongsToMany(Product, {through: OrderItem});
-Product.belongsToMany(Order, {through: OrderItem});
+Order.belongsToMany(Product, { through: OrderItem });
+Product.belongsToMany(Order, { through: OrderItem });
 
 // Create database and sync
 sequelize
-  .sync({ force: true })
-  //.sync()
-  .then(result => {
-    return User.findByPk(1);
-  })
+  //.sync({ force: true })
+  .sync()
+  .then(() => User.findByPk(1))
   .then(user => {
     if (!user) {
       return User.create({ name: 'Max', email: 'test@test.com' });
     }
     return user;
   })
-  .then((user) => user.createCart())
+  .then(user => user.createCart())
   .then(() => app.listen(3000))
   .catch(err => console.log(err));
