@@ -59,9 +59,13 @@ module.exports.getRemoveFromCart = (req, res) => {
 };
 
 module.exports.postOrder = (req, res) => {
+  let fetchedCart;
   req.user
     .getCart()
-    .then(cart => cart.getProducts())
+    .then(cart => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
     .then(products =>
       req.user.createOrder().then(order =>
         order.addProducts(
@@ -72,15 +76,22 @@ module.exports.postOrder = (req, res) => {
         )
       )
     )
+    .then(() => {
+      fetchedCart.setProducts(null);
+    })
     .then(() => res.redirect('/orders'))
     .catch(err => console.log(err));
 };
 
 module.exports.getOrders = (req, res) => {
-  res.render('shop/orders', {
-    pageTitle: 'Orders',
-    path: '/orders'
-  });
+  req.user.getOrders({include: ['products']})
+    .then(orders => res.render('shop/orders', {
+      pageTitle: 'Orders',
+      path: '/orders',
+      orders
+    }))
+    .catch(err => console.log(err));
+
 };
 
 module.exports.getCheckout = (req, res) => {
